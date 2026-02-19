@@ -151,7 +151,7 @@ app.patch('/api/sessions/:id/title', async (req, res) => {
 
 app.post('/api/messages', async (req, res) => {
   try {
-    const { session_id, role, content, imageData } = req.body;
+    const { session_id, role, content, imageData, charts, toolCalls } = req.body;
     if (!session_id || !role || content === undefined)
       return res.status(400).json({ error: 'session_id, role, content required' });
     const msg = {
@@ -161,6 +161,8 @@ app.post('/api/messages', async (req, res) => {
       ...(imageData && {
         imageData: Array.isArray(imageData) ? imageData : [imageData],
       }),
+      ...(charts?.length && { charts }),
+      ...(toolCalls?.length && { toolCalls }),
     };
     await db.collection('sessions').updateOne(
       { _id: new ObjectId(session_id) },
@@ -194,6 +196,8 @@ app.get('/api/messages', async (req, res) => {
         images: arr.length
           ? arr.map((img) => ({ data: img.data, mimeType: img.mimeType }))
           : undefined,
+        charts: m.charts?.length ? m.charts : undefined,
+        toolCalls: m.toolCalls?.length ? m.toolCalls : undefined,
       };
     });
     res.json(msgs);

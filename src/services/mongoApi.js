@@ -53,10 +53,10 @@ export const updateSessionTitle = async (sessionId, title) => {
 
 // ── Messages ─────────────────────────────────────────────────────────────────
 
-export const saveMessage = async (sessionId, role, content, imageData = null) => {
+export const saveMessage = async (sessionId, role, content, imageData = null, charts = null, toolCalls = null) => {
   return api('/api/messages', {
     method: 'POST',
-    body: JSON.stringify({ session_id: sessionId, role, content, imageData }),
+    body: JSON.stringify({ session_id: sessionId, role, content, imageData, charts, toolCalls }),
   });
 };
 

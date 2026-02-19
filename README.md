@@ -1,13 +1,13 @@
 # Chat App
 
-A React chatbot with Gemini AI, user auth, and MongoDB persistence. Yale-inspired styling with streaming responses and image support.
+A React chatbot with Gemini AI, user auth, MongoDB persistence, and client-side data analysis. Glassmorphism UI with streaming responses, CSV upload, code execution, and interactive charts.
 
 ## How It Works
 
-- **Frontend (React)** – Login/create account, chat UI with streaming, drag-and-drop images
-- **Backend (Express)** – REST API for users and messages, connects to MongoDB
-- **AI (Gemini)** – Chat responses streamed in real time
-- **Storage (MongoDB)** – Users and messages stored in `chatapp` database
+- **Frontend (React)** – Login/create account, chat UI with streaming, drag-and-drop CSV/images, Recharts bar charts
+- **Backend (Express)** – REST API for users and sessions, connects to MongoDB
+- **AI (Gemini)** – Streaming chat, Google Search grounding, Python code execution, and function calling for client-side tools
+- **Storage (MongoDB)** – Users and chat sessions stored in `chatapp` database
 
 ## API Keys & Environment Variables
 
@@ -80,6 +80,8 @@ npm install
 npm start
 ```
 
+> **Note:** `npm install` installs all required packages automatically. See [Dependencies](#dependencies) below for the full list.
+
 ### Option 2: Separate terminals (recommended for development)
 
 First, install dependencies once:
@@ -112,12 +114,56 @@ Use the app at **http://localhost:3000**. The React dev server proxies `/api` re
 - http://localhost:3001 – Server status page  
 - http://localhost:3001/api/status – JSON with `usersCount` and `sessionsCount`
 
+## Dependencies
+
+All packages are installed via `npm install`. Key dependencies:
+
+### Frontend
+
+| Package | Purpose |
+|---------|---------|
+| `react`, `react-dom` | UI framework |
+| `react-scripts` | Create React App build tooling |
+| `@google/generative-ai` | Gemini API client (chat, function calling, code execution, search grounding) |
+| `react-markdown` | Render markdown in AI responses |
+| `remark-gfm` | GitHub-flavored markdown (tables, strikethrough, etc.) |
+| `recharts` | Interactive bar charts for keyword engagement analysis |
+
+### Backend
+
+| Package | Purpose |
+|---------|---------|
+| `express` | HTTP server and REST API |
+| `mongodb` | MongoDB driver for Node.js |
+| `bcryptjs` | Password hashing |
+| `cors` | Cross-origin request headers |
+| `dotenv` | Load `.env` variables |
+
+### Dev / Tooling
+
+| Package | Purpose |
+|---------|---------|
+| `concurrently` | Run frontend and backend with a single `npm start` |
+
+---
+
 ## Features
 
 - **Create account / Login** – Username + password, hashed with bcrypt
-- **Chat** – Streaming Gemini responses
-- **Image support** – Drag images into the chat
-- **History** – Messages saved to MongoDB and loaded on login
+- **Session-based chat history** – Each conversation is a separate session; sidebar lists all chats with delete option
+- **Streaming Gemini responses** – Text streams in real time with animated "..." while thinking; Stop button to cancel
+- **Google Search grounding** – Answers include cited web sources for factual queries
+- **Python code execution** – Gemini writes and runs Python for plots, regression, and custom analysis
+- **CSV upload** – Drag-and-drop or click to attach a CSV; columns are parsed and made available to all tools
+- **Client-side data analysis tools** – Fast, free function-calling tools run in the browser (no Python needed for common stats):
+  - `compute_column_stats` – mean, median, std, min, max for a numeric column
+  - `get_value_counts` – count of each unique value in a categorical column
+  - `compute_correlation` – Pearson correlation between two numeric columns
+  - `filter_and_aggregate` – aggregate a column after filtering rows (e.g. mean likes where type = "tweet")
+  - `get_top_rows` – top N rows sorted by a column
+  - `compare_keyword_engagement` – for a list of keywords, compute mean engagement with vs without each keyword and render a grouped bar chart
+- **Markdown rendering** – AI responses render headers, lists, code blocks, tables, and links
+- **Image support** – Attach images via drag-and-drop or the 📎 button
 
 ## Chat System Prompt
 
