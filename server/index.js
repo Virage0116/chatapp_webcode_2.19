@@ -12,9 +12,13 @@ app.use(express.json({ limit: '10mb' }));
 const URI = process.env.REACT_APP_MONGODB_URI || process.env.MONGODB_URI || process.env.REACT_APP_MONGO_URI;
 const DB = 'chatapp';
 
+console.log('MONGODB URI present:', !!URI);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
 let db;
 
 async function connect() {
+  if (!URI) throw new Error('No MongoDB URI found. Set REACT_APP_MONGODB_URI or MONGODB_URI.');
   const client = await MongoClient.connect(URI);
   db = client.db(DB);
   console.log('MongoDB connected');
@@ -210,10 +214,17 @@ app.get('/api/messages', async (req, res) => {
 // ── Serve React build in production ──────────────────────────────────────────
 
 const buildPath = path.join(__dirname, '..', 'build');
-app.use(express.static(buildPath));
-app.use((req, res) => {
-  res.sendFile(path.join(buildPath, 'index.html'));
-});
+const fs = require('fs');
+if (fs.existsSync(buildPath)) {
+  console.log('Serving React build from', buildPath);
+  app.use(express.static(buildPath));
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+} else {
+  console.log('No build folder found — skipping static file serving');
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
